@@ -45,7 +45,10 @@ class ExporterCommands {
         MAPPER.writeValue(File(outputDirectory, SUMMARIES_FILENAME), summaries)
         summaries.forEach {
             val detail = client.getDetail(it)
-            MAPPER.writeValue(File(outputDirectory, "${it.trackid}.json"), detail)
+            val f = File(outputDirectory, "${it.trackid}.json")
+            if (!f.exists()) {
+                MAPPER.writeValue(f, detail)
+            }
         }
 
         logger.info("All resources have been downloaded")
