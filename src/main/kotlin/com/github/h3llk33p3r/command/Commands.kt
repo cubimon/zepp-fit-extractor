@@ -44,9 +44,9 @@ class ExporterCommands {
         //Write to file
         MAPPER.writeValue(File(outputDirectory, SUMMARIES_FILENAME), summaries)
         summaries.forEach {
-            val detail = client.getDetail(it)
             val f = File(outputDirectory, "${it.trackid}.json")
             if (!f.exists()) {
+                val detail = client.getDetail(it)
                 MAPPER.writeValue(f, detail)
             }
         }
