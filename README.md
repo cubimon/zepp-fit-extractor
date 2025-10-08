@@ -128,4 +128,41 @@ function foo() {
 }
 
 setInterval(foo, 500);
+
+```bash
+java -jar ./target/zepp-fit-extractor*.jar
+
+download-all --token ${token} --output download
+
+generate-all --input-dir download --output generated
+```
+
+
+```sql
+CREATE DATABASE workouts;
+
+-- Enable TimescaleDB extension
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+
+\c workouts
+
+-- Create a hypertable for workout metrics
+CREATE TABLE workout_metrics (
+    workout_type VARCHAR(255),
+    workout_id TEXT,
+    timestamp TIMESTAMPTZ,
+    distance FLOAT,
+    heart_rate INT,
+    cadence INT,
+    speed FLOAT,
+    enhanced_speed FLOAT,
+    altitude FLOAT,
+    enhanced_altitude FLOAT,
+    step_length FLOAT,
+    position_lat FLOAT,
+    position_long FLOAT
+);
+
+-- Convert to hypertable
+SELECT create_hypertable('workout_metrics', 'timestamp');
 ```
