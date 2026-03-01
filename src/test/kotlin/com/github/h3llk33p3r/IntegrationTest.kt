@@ -61,6 +61,7 @@ class IntegrationTest {
         val outputfit = converter.convertToFit(output, summary, detail)
         assertNotNull(outputfit)
         checkFitGenerated(outputfit!!)
+        outputfit.delete()
     }
 
     @Test
@@ -74,6 +75,7 @@ class IntegrationTest {
         val outputfit = converter.convertToFit(output, summary, detail)
         assertNotNull(outputfit)
         checkFitGenerated(outputfit!!)
+        outputfit.delete()
     }
 
     @Test
@@ -87,5 +89,6 @@ class IntegrationTest {
         val outputfit = converter.convertToFit(output, summary, detail)
         assertNotNull(outputfit)
         checkFitGenerated(outputfit!!)
+        outputfit.delete()
     }
 }

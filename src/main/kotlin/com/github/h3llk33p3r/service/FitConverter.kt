@@ -55,8 +55,13 @@ class FitConverter {
      */
     fun convertToFit(outputDirectory: File, summary: SportSummary, detail: SportDetail): File? {
         val container = SportContainer(summary, detail)
-        log.info("Generating fit file for activity [{}]", container.id)
         if (container.activityType.supported) {
+            val outputFile = File(outputDirectory, "${container.activityType.name}-${container.id}.fit")
+            if (outputFile.exists()) {
+                log.info("fit file already exists [{}]", container.id)
+                return null
+            }
+            log.info("Generating fit file for activity [{}]", container.id)
 
             val messages: MutableList<Mesg> = ArrayList()
             //Mandatory field
@@ -65,7 +70,6 @@ class FitConverter {
             messages.add(generateActivityMessage(container))
             //Manage data of activity
             messages.addAll(fillActivity(container))
-            val outputFile = File(outputDirectory, "${container.activityType.name}-${container.id}.fit")
             writeFitFile(outputFile, messages)
             return outputFile
         } else {
