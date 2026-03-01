@@ -12,7 +12,7 @@ import java.io.IOException
 
 class ZeppRestClient(private val baseUrl: String, private val token: String) {
 
-    private val log = LoggerFactory.getLogger(ZeppRestClient.javaClass)
+    private val log = LoggerFactory.getLogger(ZeppRestClient::class.java)
 
     //Create the client
     private val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(Interceptor { chain: Interceptor.Chain ->

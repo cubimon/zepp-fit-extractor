@@ -47,30 +47,6 @@ Java 17 needed.
 ### Start and use the application
 
 Now start the application : `java -jar ./target/zepp-fit-extractor*.jar`.
-On the console, you can type `help` to print the available commands.
-
-```commandline
-shell:>help
-AVAILABLE COMMANDS
-
-Built-In Commands
-       help: Display help about available commands
-       clear: Clear the shell screen.
-       quit, exit: Exit the shell.
-       script: Read and execute commands from a file.
-
-Exporter Commands
-       generate-single: Generate a single activity based on the trackId
-       download-all: Download all sport activities from remote web services
-       generate-all: Generate all activities .fit file using previous downloaded resources.
-       generate-sport: Generate a activities for a provided sport type
-```
-
-For details about a command you can use `help <command>` (ie `help download-all`).
-For the main use case, you need to :
-
-1. Download all resources linked with you account (`download-all`)
-2. Generate all fit files (`generate-all`)
 
 ## Change log
 
@@ -128,23 +104,20 @@ function foo() {
 }
 
 setInterval(foo, 500);
-
-```bash
-java -jar ./target/zepp-fit-extractor*.jar
-
-download-all --token ${token} --output download
-
-generate-all --input-dir download --output generated
 ```
 
+```bash
+python fit-exporter.py
+```
 
 ```sql
 CREATE DATABASE workouts;
 
+-- switch to new database
+\c workouts
+
 -- Enable TimescaleDB extension
 CREATE EXTENSION IF NOT EXISTS timescaledb;
-
-\c workouts
 
 -- Create a hypertable for workout metrics
 CREATE TABLE workout_metrics (

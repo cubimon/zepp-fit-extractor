@@ -10,31 +10,18 @@ import com.github.h3llk33p3r.client.ZeppRestClient
 import com.github.h3llk33p3r.io.ActivityType
 import com.github.h3llk33p3r.service.FitConverter
 import org.slf4j.LoggerFactory
-import org.springframework.shell.standard.EnumValueProvider
-import org.springframework.shell.standard.FileValueProvider
-import org.springframework.shell.standard.ShellComponent
-import org.springframework.shell.standard.ShellMethod
-import org.springframework.shell.standard.ShellOption
+import org.springframework.stereotype.Component
 import java.io.File
 
-@ShellComponent("Zepp Fix Extractor")
+@Component
 class ExporterCommands {
 
     private val converter = FitConverter()
     private val logger = LoggerFactory.getLogger(ExporterCommands::class.java)
 
-    @ShellMethod(key = ["download-all"], value = "Download all sport activities from remote web services")
     fun downloadAll(
-        @ShellOption(
-            value = ["-t", "--token"],
-            help = "The token to use to be able to download all resources."
-        ) token: String,
-
-        @ShellOption(
-            value = ["-o", "--output"],
-            help = "The output directory to store the data.",
-            valueProvider = FileValueProvider::class
-        ) outputDirectory: File,
+        token: String,
+        outputDirectory: File,
     ) {
 
         checkAndCreateOutDirectory(outputDirectory)
@@ -64,18 +51,9 @@ class ExporterCommands {
         }
     }
 
-    @ShellMethod(key = ["generate-all"], value = "Generate all activities .fit file using previous downloaded resources.")
-    fun downloadAll(
-        @ShellOption(
-            value = ["-i", "--input-dir"],
-            help = "The input directory containing json downloaded with download-all command",
-            valueProvider = FileValueProvider::class
-        ) inputDir: File,
-        @ShellOption(
-            value = ["-o", "--output"],
-            help = "The output directory to store .fit files.",
-            valueProvider = FileValueProvider::class
-        ) outputDirectory: File
+    fun generateAll(
+        inputDir: File,
+        outputDirectory: File
     ) {
 
         val summariesFile = File(inputDir, SUMMARIES_FILENAME)
@@ -102,22 +80,10 @@ class ExporterCommands {
         }
     }
 
-    @ShellMethod(key = ["generate-single"], value = "Generate a single activity based on the trackId")
     fun generateSingle(
-        @ShellOption(
-            value = ["-i", "--input-dir"],
-            help = "The input directory containing json downloaded with download-all command",
-            valueProvider = FileValueProvider::class
-        ) inputDir: File,
-        @ShellOption(
-            value = ["-o", "--output"],
-            help = "The output directory to store .fit files.",
-            valueProvider = FileValueProvider::class
-        ) outputDirectory: File,
-        @ShellOption(
-            value = ["--id"],
-            help = "The identifier of the activity."
-        ) trackId: String
+        inputDir: File,
+        outputDirectory: File,
+        trackId: String
     ) {
 
         val summariesFile = File(inputDir, SUMMARIES_FILENAME)
@@ -132,23 +98,10 @@ class ExporterCommands {
         }
     }
 
-    @ShellMethod(key = ["generate-sport"], value = "Generate a activities for a provided sport type")
     fun generateForSport(
-        @ShellOption(
-            value = ["-i", "--input-dir"],
-            help = "The input directory containing json downloaded with download-all command",
-            valueProvider = FileValueProvider::class
-        ) inputDir: File,
-        @ShellOption(
-            value = ["-o", "--output"],
-            help = "The output directory to store .fit files.",
-            valueProvider = FileValueProvider::class
-        ) outputDirectory: File,
-        @ShellOption(
-            value = ["-s", "--sport"],
-            help = "The sport to generate the activities.",
-            valueProvider = EnumValueProvider::class
-        ) sportType: ActivityType
+        inputDir: File,
+        outputDirectory: File,
+        sportType: ActivityType
     ) {
 
         val summariesFile = File(inputDir, SUMMARIES_FILENAME)
