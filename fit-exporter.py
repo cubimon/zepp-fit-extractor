@@ -1,4 +1,5 @@
 import os
+import json
 from fitparse import FitFile
 from psycopg2 import connect
 from psycopg2.extensions import cursor, connection
@@ -6,6 +7,16 @@ from psycopg2.extras import execute_values
 from datetime import timezone
 
 all_field_names = set()
+summaries = None
+
+with open('download/summaries.json') as f:
+    summaries = json.load(f)
+
+
+def find_summary(workout_id):
+    for summary in summaries:
+        if summary['trackid'] == workout_id:
+            return summary
 
 
 def parse_fit_file(
@@ -13,7 +24,34 @@ def parse_fit_file(
         workout_type: str,
         workout_id: str):
     fitfile = FitFile(file_path)
-    metrics = []
+    workout_metrics = []
+    summary = find_summary(workout_id)
+    workout = (
+        workout_id,
+        summary['end_time'],
+        summary['dis'],
+        summary['calorie'],
+        summary['run_time'],
+        summary['total_step'],
+        summary['avg_stride_length'],
+        summary['avg_pace'],
+        summary['min_pace'],
+        summary['max_pace'],
+        summary['avg_frequency'],
+        summary['avg_heart_rate'],
+        summary['min_heart_rate'],
+        summary['max_heart_rate'],
+        summary['min_altitude'],
+        summary['max_altitude'],
+        summary['altitude_ascend'],
+        summary['altitude_descend'],
+        summary['avg_altitude'],
+        summary['distance_ascend'],
+        summary['climb_dis_descend'],
+        summary['climb_dis_ascend_time'],
+        summary['climb_dis_descend_time'],
+        summary['te'],
+        summary['anaerobic_te'])
     for record in fitfile.get_messages('record'):
         timestamp = record.get_value('timestamp')
         distance = record.get_value('distance')
@@ -32,7 +70,7 @@ def parse_fit_file(
             continue
         # Ensure UTC timezone
         timestamp = timestamp.replace(tzinfo=timezone.utc)
-        metrics.append((
+        workout_metrics.append((
             workout_type,
             workout_id,
             timestamp,
@@ -48,7 +86,7 @@ def parse_fit_file(
             position_long
         ))
 
-    return metrics
+    return workout_metrics, workout
 
 
 def workout_exists(
@@ -66,7 +104,7 @@ def workout_exists(
     return result is not None
 
 
-def insert_metrics(conn: connection, cur: cursor, metrics):
+def insert_workout_metrics(conn: connection, cur: cursor, metrics):
     query = """
     INSERT INTO workout_metrics (
         workout_type,
@@ -89,6 +127,41 @@ def insert_metrics(conn: connection, cur: cursor, metrics):
     conn.commit()
 
 
+def insert_workout(conn: connection, cur: cursor, workout):
+    query = """
+    INSERT INTO workouts (
+        workout_id,
+        end_time,
+        dis,
+        calorie,
+        run_time,
+        total_step,
+        avg_stride_length,
+        avg_pace,
+        min_pace,
+        max_pace,
+        avg_frequency,
+        avg_heart_rate,
+        min_heart_rate,
+        max_heart_rate,
+        min_altitude,
+        max_altitude,
+        altitude_ascend,
+        altitude_descend,
+        avg_altitude,
+        distance_ascend,
+        climb_dis_descend,
+        climb_dis_ascend_time,
+        climb_dis_descend_time,
+        te,
+        anaerobic_te)
+    VALUES %s
+    ON CONFLICT DO NOTHING
+    """
+    execute_values(cur, query, [workout])
+    conn.commit()
+
+
 if __name__ == "__main__":
     fit_folder = "./generated"
     conn = connect(
@@ -105,8 +178,10 @@ if __name__ == "__main__":
                 continue
             print(f"exporting {filename}")
             file_path = os.path.join(fit_folder, filename)
-            metrics = parse_fit_file(file_path, workout_type, workout_id)
-            insert_metrics(conn, cur, metrics)
+            workout_metrics, workout = parse_fit_file(
+                file_path, workout_type, workout_id)
+            insert_workout_metrics(conn, cur, workout_metrics)
+            insert_workout(conn, cur, workout)
     cur.close()
     conn.close()
     print("All FIT files processed and stored in TimescaleDB.")

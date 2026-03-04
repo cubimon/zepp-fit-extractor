@@ -136,6 +136,37 @@ CREATE TABLE workout_metrics (
     position_long FLOAT
 );
 
+-- Create a hypertable for workout metrics
+CREATE TABLE workouts (
+    workout_id TEXT,
+    end_time INT,
+    dis FLOAT,
+    calorie FLOAT,
+    run_time FLOAT, -- minutes
+    total_step INT,
+    avg_stride_length INT,
+    avg_pace FLOAT,
+    min_pace FLOAT,
+    max_pace FLOAT,
+    avg_frequency FLOAT,
+    avg_heart_rate FLOAT,
+    min_heart_rate INT,
+    max_heart_rate INT,
+    min_altitude INT,
+    max_altitude INT,
+    altitude_ascend INT,
+    altitude_descend INT,
+    avg_altitude FLOAT,
+    distance_ascend INT,
+    climb_dis_descend INT,
+    climb_dis_ascend_time INT,
+    climb_dis_descend_time INT,
+    te INT,
+    anaerobic_te INT
+);
+
+-- TODO: index, join, grafana visualization
+
 -- Convert to hypertable
 SELECT create_hypertable('workout_metrics', 'timestamp');
 ```
