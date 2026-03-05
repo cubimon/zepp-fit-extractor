@@ -4,7 +4,7 @@ from fitparse import FitFile
 from psycopg2 import connect
 from psycopg2.extensions import cursor, connection
 from psycopg2.extras import execute_values
-from datetime import timezone
+from datetime import timezone, datetime
 
 all_field_names = set()
 summaries = None
@@ -27,8 +27,9 @@ def parse_fit_file(
     workout_metrics = []
     summary = find_summary(workout_id)
     workout = (
+        workout_type,
         workout_id,
-        summary['end_time'],
+        datetime.fromtimestamp(int(summary['end_time'])),
         summary['dis'],
         summary['calorie'],
         summary['run_time'],
@@ -130,6 +131,7 @@ def insert_workout_metrics(conn: connection, cur: cursor, metrics):
 def insert_workout(conn: connection, cur: cursor, workout):
     query = """
     INSERT INTO workouts (
+        workout_type,
         workout_id,
         end_time,
         dis,

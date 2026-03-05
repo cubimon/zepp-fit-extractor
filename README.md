@@ -138,8 +138,9 @@ CREATE TABLE workout_metrics (
 
 -- Create a hypertable for workout metrics
 CREATE TABLE workouts (
+    workout_type VARCHAR(255),
     workout_id TEXT,
-    end_time INT,
+    end_time TIMESTAMPTZ,
     dis FLOAT,
     calorie FLOAT,
     run_time FLOAT, -- minutes
@@ -169,4 +170,5 @@ CREATE TABLE workouts (
 
 -- Convert to hypertable
 SELECT create_hypertable('workout_metrics', 'timestamp');
+SELECT create_hypertable('workouts', 'end_time');
 ```
